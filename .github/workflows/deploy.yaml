@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+
+      - name: GAE deploy
+        run: |
+          echo $GCLOUD_SERVICE_KEY | base64 -d > ./src/main/resources/service-account.json
+          gcloud config set project ii-ne-bot
+          gcloud auth activate-service-account --key-file ./src/main/resources/service-account.json
+          echo $SECRET_KEY | base64 -d > ./secret.yaml
+          gradle appengineDeploy --stacktrace
+        env:
+          CI: true

@@ -1,0 +1,102 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        // Spring Boot Gradle Plugin を使用
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.2.0.RELEASE'
+        // Google App Engine Gradle plugin を使用
+        classpath 'com.google.cloud.tools:appengine-gradle-plugin:2.4.1'
+    }
+}
+
+plugins {
+    id 'org.springframework.boot' version '2.4.1'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
+    id 'groovy'
+}
+
+apply plugin: 'com.google.cloud.tools.appengine'
+
+group = 'com.fooqoo56.iine.bot.publisher'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+}
+
+ext {
+    set('springCloudGcpVersion', "2.0.0-RC2")
+    set('springCloudVersion', "2020.0.0")
+}
+
+dependencies {
+    implementation(
+            'com.google.appengine:appengine-api-1.0-sdk:+',
+            'org.springframework.boot:spring-boot-starter-actuator',
+            'org.springframework.boot:spring-boot-starter-validation',
+            'org.springframework.boot:spring-boot-starter-web',
+            'org.springframework.cloud:spring-cloud-gcp-starter-pubsub:1.2.6.RELEASE',
+            'org.springframework.cloud:spring-cloud-gcp-pubsub-stream-binder:1.2.6.RELEASE',
+            'org.springframework.integration:spring-integration-core',
+            'com.google.oauth-client:google-oauth-client:1.31.4'
+    )
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation(
+            'org.springframework.boot:spring-boot-starter-test',
+            'org.spockframework:spock-core:1.1-groovy-2.4-rc-2',
+            'org.spockframework:spock-spring:1.1-groovy-2.4-rc-2',
+            'cglib:cglib-nodep:3.3.0'
+    )
+}
+
+// bootRun タスクの設定を追加する
+bootRun {
+    // プロファイルを指定する
+    jvmArgs = ['-Dspring.profiles.active=prod']
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:${springCloudGcpVersion}"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+test {
+    testLogging {
+        // テスト時の標準出力と標準エラー出力を表示する
+        showStandardStreams true
+        // イベントを出力する (TestLogEvent)
+        events 'started', 'skipped', 'passed', 'failed'
+    }
+}
+
+// Google App Engine タスクの設定
+appengine {
+    // デプロイ時の設定
+    // GCLOUD_CONFIG を指定しておくと
+    // gcloud config で設定しているプロジェクト情報がセットされる
+    deploy {
+        // デプロイ先の Google Cloud Project ID
+        projectId = "ii-ne-bot"
+        // デプロイによって反映される Web アプリのバージョン
+        // 指定しなければ新しく生成される
+        version = "1-0-0"
+    }
+}
+
+// デプロイ前にテストを実行
+appengineDeploy.dependsOn test
+appengineStage.dependsOn test
