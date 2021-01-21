@@ -74,7 +74,7 @@ public class FavoriteSubscribeService {
      */
     private boolean notContainQuery(final String text, final String query) {
         if (StringUtils.isBlank(text) || StringUtils.isBlank(query)) {
-            return false;
+            return true;
         }
 
         return !text.contains(query);
