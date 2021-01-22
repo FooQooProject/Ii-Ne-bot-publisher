@@ -2,14 +2,7 @@
 runtime: java11
 
 # Java 8 ランタイムの F1 ではメモリが 128MB だったが Java 11 では 256MB
-instance_class: F2
-
-# インスタンス数のオートスケール設定
-automatic_scaling:
-  max_instances: 1 # 最大インスタンス数
-  min_instances: 0 # 最小インスタンス数。0にすると使われていないときはインスタンス数が0になる
-  target_cpu_utilization: 0.95 # 新しいインスタンスを立ち上げるトリガーとなるCPU負荷率(0.5から0.95の間で指定)
-  max_concurrent_requests: 80 # 許容する同時リクエスト数(指定できる最大値は80)
+instance_class: B4
 
 includes:
   - secret.yaml
