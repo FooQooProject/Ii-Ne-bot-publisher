@@ -61,8 +61,8 @@ public class FavoriteSubscribeService {
                 || isGraterThan(res.getRetweetCount(), condition.getRetweetCount())
                 || isGraterThan(res.getUser().getFollowersCount(), condition.getFollowersCount())
                 || isGraterThan(res.getUser().getFriendsCount(), condition.getFriendsCount()))
-                && (!res.getFavoriteFlag() || !res.getSensitiveFlag()
-                || StringUtils.isBlank(res.getInReplyToStatusId()));
+                && (!res.getFavoriteFlag() && !res.getSensitiveFlag()
+                && StringUtils.isBlank(res.getInReplyToStatusId()));
     }
 
     /**
