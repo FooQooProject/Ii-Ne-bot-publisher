@@ -1,9 +1,13 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        required: true
+        description: ログレベル
+        default: warning
+      tags:
 
 env:
   GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
