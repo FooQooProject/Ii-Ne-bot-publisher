@@ -57,12 +57,14 @@ public class FavoriteSubscribeService {
             return false;
         }
 
-        return (isGraterThan(res.getFavoriteCount(), condition.getFavoriteCount())
+        return isGraterThan(res.getFavoriteCount(), condition.getFavoriteCount())
                 && isGraterThan(res.getRetweetCount(), condition.getRetweetCount())
                 && isGraterThan(res.getUser().getFollowersCount(), condition.getFollowersCount())
-                && isGraterThan(res.getUser().getFriendsCount(), condition.getFriendsCount()))
-                && (!res.getFavoriteFlag() && !res.getSensitiveFlag()
-                && StringUtils.isBlank(res.getInReplyToStatusId()));
+                && isGraterThan(res.getUser().getFriendsCount(), condition.getFriendsCount())
+                && !res.getFavoriteFlag()
+                && !res.getSensitiveFlag()
+                && !res.getQuoteFlag()
+                && StringUtils.isBlank(res.getInReplyToStatusId());
     }
 
     /**
@@ -92,6 +94,6 @@ public class FavoriteSubscribeService {
             return false;
         }
 
-        return left > right;
+        return left >= right;
     }
 }

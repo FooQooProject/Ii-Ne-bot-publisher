@@ -1,4 +1,12 @@
 ---
+spring:
+  cloud:
+    stream:
+      bindings:
+        favorite-in-0:
+          destination:
+            favorite
+
 extension:
   oauth:
     twitter:
