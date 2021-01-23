@@ -4,22 +4,27 @@ spring:
     gcp:
       credentials:
         location: classpath:ii-ne-bot.json
+    stream:
+      bindings:
+        favorite-in-0:
+          destination:
+            stg-favorite
 
 extension:
   oauth:
     twitter:
       base-url: https://api.twitter.com
       path: /oauth2/token
-      connect-timeout: 1000
-      read-timeout: 1000
+      connect-timeout: 10000
+      read-timeout: 10000
       api-key: ${API_KEY}
       api-secret: ${API_SECRET}
   api:
     twitter:
       base-url: https://api.twitter.com
       path: /1.1/
-      connect-timeout: 1000
-      read-timeout: 1000
+      connect-timeout: 10000
+      read-timeout: 10000
       api-key: ${API_KEY}
       api-secret: ${API_SECRET}
       access-token: ${ACCESS_TOKEN}
