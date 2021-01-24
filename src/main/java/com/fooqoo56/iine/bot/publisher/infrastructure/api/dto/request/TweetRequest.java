@@ -48,7 +48,7 @@ public class TweetRequest implements Serializable {
     public static TweetRequest convertPayloadToRequest(final TweetCondition payload) {
         return TweetRequest
                 .builder()
-                .query(payload.getQuery())
+                .query(addFilterRetweet(payload.getQuery()))
                 .maxId(DEFAULT_MAX_ID)
                 .build();
     }
@@ -64,9 +64,19 @@ public class TweetRequest implements Serializable {
                                                                   final String maxId) {
         return TweetRequest
                 .builder()
-                .query(payload.getQuery())
+                .query(addFilterRetweet(payload.getQuery()))
                 .maxId(maxId)
                 .build();
+    }
+
+    /**
+     * クエリにリツイートを除くフィルタを追加する.
+     *
+     * @param query クエリ
+     * @return フィルタ付きクエリ
+     */
+    private static String addFilterRetweet(final String query) {
+        return query + " -filter:retweets";
     }
 
     /**
