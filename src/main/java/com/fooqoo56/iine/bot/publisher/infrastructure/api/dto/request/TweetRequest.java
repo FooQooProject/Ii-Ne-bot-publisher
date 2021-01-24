@@ -16,6 +16,8 @@ public class TweetRequest implements Serializable {
 
     private static final long serialVersionUID = 4303034636519921068L;
 
+    private static final String DEFAULT_MAX_ID = "-1";
+
     @NonNull
     String query;
 
@@ -34,6 +36,9 @@ public class TweetRequest implements Serializable {
     @NonNull
     LocalDate until = LocalDate.now();
 
+    @NonNull
+    String maxId;
+
     /**
      * payloadをAPIクエリへ変換.
      *
@@ -44,6 +49,23 @@ public class TweetRequest implements Serializable {
         return TweetRequest
                 .builder()
                 .query(payload.getQuery())
+                .maxId(DEFAULT_MAX_ID)
+                .build();
+    }
+
+    /**
+     * payloadをAPIクエリへ変換.
+     *
+     * @param payload PayLoad
+     * @param maxId   maxId
+     * @return APIクエリ
+     */
+    public static TweetRequest convertPayloadToRequestWithPayload(final TweetCondition payload,
+                                                                  final String maxId) {
+        return TweetRequest
+                .builder()
+                .query(payload.getQuery())
+                .maxId(maxId)
                 .build();
     }
 
@@ -61,6 +83,7 @@ public class TweetRequest implements Serializable {
         queries.add("count", count.toString());
         queries.add("include_entities", includeEntitiesFlag.toString());
         queries.add("until", until.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        queries.add("max_id", maxId);
 
         return queries;
     }
