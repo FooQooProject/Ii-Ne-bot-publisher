@@ -2,10 +2,10 @@ package com.fooqoo56.iine.bot.publisher.application.service;
 
 import com.fooqoo56.iine.bot.publisher.application.exception.IncorrectFavoriteTweetException;
 import com.fooqoo56.iine.bot.publisher.application.exception.NotFoundTweetException;
-import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.response.TweetListResponse;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.response.TweetResponse;
 import com.fooqoo56.iine.bot.publisher.presentation.dto.mq.TweetCondition;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +23,14 @@ public class FavoriteSubscribeService {
      * いいね作成.
      *
      * @param payload 検索条件
-     * @throws NotFoundTweetException ツイートが見つからない場合の例外
+     * @throws NotFoundTweetException          ツイートが見つからない場合の例外
+     * @throws IncorrectFavoriteTweetException いいねしたツイートと取得したツイートが一致しない場合の例外
      */
-    public void createFavorite(final TweetCondition payload) throws NotFoundTweetException {
-        final TweetListResponse response = twitterService.findTweet(payload);
+    public void createFavorite(final TweetCondition payload)
+            throws NotFoundTweetException, IncorrectFavoriteTweetException {
+        final List<TweetResponse> response = twitterService.findTweet(payload);
         final TweetResponse tweet =
-                response.getStatuses().stream().filter(res -> isValidatedTweet(res, payload))
+                response.stream().filter(res -> isValidatedTweet(res, payload))
                         .max(Comparator.comparingInt(s -> s.getUser().getFavouritesCount()))
                         .orElseThrow(NotFoundTweetException::new);
 
