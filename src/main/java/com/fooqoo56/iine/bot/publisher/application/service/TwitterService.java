@@ -1,5 +1,6 @@
 package com.fooqoo56.iine.bot.publisher.application.service;
 
+import com.fooqoo56.iine.bot.publisher.application.exception.AlreadyFavoritedTweetException;
 import com.fooqoo56.iine.bot.publisher.domain.api.repository.TwitterRepository;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.request.TweetRequest;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.response.TweetListResponse;
@@ -62,14 +63,23 @@ public class TwitterService {
     /**
      * ツイートをいいねする.
      *
-     * @param id ツイートID
+     * @param tweetIds ツイートIDのリスト
      * @return ツイートレスポンス
+     * @throws AlreadyFavoritedTweetException 全てのツイートがすでにいいねされたツイートだった場合の例外
      */
-    public TweetResponse favoriteTweet(final String id) {
+    public TweetResponse favoriteTweet(final List<String> tweetIds)
+            throws AlreadyFavoritedTweetException {
 
-        if (StringUtils.isNoneBlank(id)) {
-            return twitterRepository.favoriteTweet(id);
+        for (final String id : tweetIds) {
+            if (StringUtils.isNoneBlank(id)) {
+                try {
+                    return twitterRepository.favoriteTweet(id);
+                } catch (final RuntimeException exception) {
+                    log.warn(exception.getMessage());
+                }
+            }
         }
-        return new TweetResponse();
+
+        throw new AlreadyFavoritedTweetException();
     }
 }

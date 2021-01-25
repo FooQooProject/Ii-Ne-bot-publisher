@@ -26,7 +26,7 @@ public class OauthAuthorizationHeaderBuilder implements Serializable {
 
     private final String method;
 
-    private final String id;
+    private final Map<String, String> queryParameters;
 
     private final String tokenSecret;
 
@@ -42,10 +42,9 @@ public class OauthAuthorizationHeaderBuilder implements Serializable {
      * @return OauthHeader
      */
     public String getOauthHeader() {
-        final Map<String, String> parameters = new LinkedHashMap<>();
+        final Map<String, String> parameters = new LinkedHashMap<>(queryParameters);
 
         // Boiler plate parameters
-        parameters.put("id", id);
         parameters.put("oauth_timestamp", String.valueOf(Instant.now().getEpochSecond()));
         parameters.put("oauth_signature_method", "HMAC-SHA1");
         parameters.put("oauth_version", "1.0");

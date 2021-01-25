@@ -6,6 +6,7 @@ import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.request.TweetReque
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.response.TweetListResponse;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.response.TweetResponse;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.util.OauthAuthorizationHeaderBuilder;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -48,26 +49,6 @@ public class TwitterRepositoryImpl implements TwitterRepository {
     @Override
     public TweetResponse favoriteTweet(final String id) {
 
-        final String url =
-                UriComponentsBuilder.fromHttpUrl(config.getBaseUrl())
-                        .path(getFavoritePath())
-                        .queryParam("id", id)
-                        .build()
-                        .toString();
-
-        return twitterFavoriteTemplate
-                .exchange(url, HttpMethod.POST, new HttpEntity<String>(getOauth1Header(id)),
-                        TweetResponse.class)
-                .getBody();
-    }
-
-    /**
-     * OAuth1.0aの認証付きヘッダを取得する.
-     *
-     * @param id ツイートID
-     * @return ヘッダ
-     */
-    private HttpHeaders getOauth1Header(final String id) {
         final HttpHeaders headers = new HttpHeaders();
 
         final OauthAuthorizationHeaderBuilder builder = OauthAuthorizationHeaderBuilder
@@ -78,14 +59,24 @@ public class TwitterRepositoryImpl implements TwitterRepository {
                 .tokenSecret(config.getAccessTokenSecret())
                 .accessToken(config.getAccessToken())
                 .consumerKey(config.getApikey())
-                .id(id)
+                .queryParameters(Map.of("id", id))
                 .build();
 
         headers.set(HttpHeaders.AUTHORIZATION,
                 builder.getOauthHeader()
         );
 
-        return headers;
+        final String url =
+                UriComponentsBuilder.fromHttpUrl(config.getBaseUrl())
+                        .path(getFavoritePath())
+                        .queryParam("id", id)
+                        .build()
+                        .toString();
+
+        return twitterFavoriteTemplate
+                .exchange(url, HttpMethod.POST, new HttpEntity<String>(headers),
+                        TweetResponse.class)
+                .getBody();
     }
 
     /**

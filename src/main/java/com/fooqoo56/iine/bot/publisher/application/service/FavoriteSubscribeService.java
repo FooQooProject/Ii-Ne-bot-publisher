@@ -1,12 +1,13 @@
 package com.fooqoo56.iine.bot.publisher.application.service;
 
-import com.fooqoo56.iine.bot.publisher.application.exception.IncorrectFavoriteTweetException;
+import com.fooqoo56.iine.bot.publisher.application.exception.AlreadyFavoritedTweetException;
 import com.fooqoo56.iine.bot.publisher.application.exception.NotFoundTweetException;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.response.TweetResponse;
 import com.fooqoo56.iine.bot.publisher.presentation.dto.mq.TweetCondition;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,23 +24,24 @@ public class FavoriteSubscribeService {
      * いいね作成.
      *
      * @param payload 検索条件
-     * @throws NotFoundTweetException          ツイートが見つからない場合の例外
-     * @throws IncorrectFavoriteTweetException いいねしたツイートと取得したツイートが一致しない場合の例外
+     * @throws NotFoundTweetException         ツイートが見つからない場合の例外
+     * @throws AlreadyFavoritedTweetException いいねしたツイートと取得したツイートが一致しない場合の例外
      */
     public void createFavorite(final TweetCondition payload)
-            throws NotFoundTweetException, IncorrectFavoriteTweetException {
+            throws NotFoundTweetException, AlreadyFavoritedTweetException {
         final List<TweetResponse> response = twitterService.findTweet(payload);
-        final TweetResponse tweet =
+        final List<String> tweetIds =
                 response.stream().filter(res -> isValidatedTweet(res, payload))
-                        .max(Comparator.comparingInt(s -> s.getUser().getFavouritesCount()))
-                        .orElseThrow(NotFoundTweetException::new);
+                        .sorted(Comparator.comparingInt(s -> s.getUser().getFavouritesCount()))
+                        .map(TweetResponse::getId)
+                        .limit(10)
+                        .collect(Collectors.toList());
 
-        final TweetResponse tweetResponse = twitterService.favoriteTweet(tweet.getId());
-
-        if (!tweetResponse.getId().equals(tweet.getId())) {
-            throw new IncorrectFavoriteTweetException("取得したツイートといいねしたツイートが一致しません。");
+        if (tweetIds.isEmpty()) {
+            throw new NotFoundTweetException();
         }
 
+        final TweetResponse tweetResponse = twitterService.favoriteTweet(tweetIds);
     }
 
     /**
@@ -59,11 +61,11 @@ public class FavoriteSubscribeService {
             return false;
         }
 
+        // favoriteレスポンスは常にfalseを出力
         return isGraterThan(res.getFavoriteCount(), condition.getFavoriteCount())
                 && isGraterThan(res.getRetweetCount(), condition.getRetweetCount())
                 && isGraterThan(res.getUser().getFollowersCount(), condition.getFollowersCount())
                 && isGraterThan(res.getUser().getFriendsCount(), condition.getFriendsCount())
-                && !res.getFavoriteFlag()
                 && !res.getSensitiveFlag()
                 && !res.getQuoteFlag()
                 && StringUtils.isBlank(res.getInReplyToStatusId());
