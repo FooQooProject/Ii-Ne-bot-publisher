@@ -1,5 +1,6 @@
 package com.fooqoo56.iine.bot.publisher.application.service;
 
+import com.fooqoo56.iine.bot.publisher.application.exception.AlreadyFavoritedTweetException;
 import com.fooqoo56.iine.bot.publisher.domain.api.repository.TwitterRepository;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.request.TweetRequest;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.response.TweetListResponse;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class TwitterService {
+
+    private static final String NO_MORE_TWEET_ID = "0";
 
     private final TwitterRepository twitterRepository;
 
@@ -41,8 +44,9 @@ public class TwitterService {
                 if (StringUtils
                         .isBlank(tweetListResponses.get(idx - 1).getSearchMetaData()
                                 .getNextMaxId())
-                        || "0".equals(tweetListResponses.get(idx - 1).getSearchMetaData()
-                        .getNextMaxId())) {
+                        || NO_MORE_TWEET_ID
+                        .equals(tweetListResponses.get(idx - 1).getSearchMetaData()
+                                .getNextMaxId())) {
                     break;
                 }
 
@@ -62,14 +66,23 @@ public class TwitterService {
     /**
      * ツイートをいいねする.
      *
-     * @param id ツイートID
+     * @param tweetIds ツイートIDのリスト
      * @return ツイートレスポンス
+     * @throws AlreadyFavoritedTweetException 全てのツイートがすでにいいねされたツイートだった場合の例外
      */
-    public TweetResponse favoriteTweet(final String id) {
+    public TweetResponse favoriteTweet(final List<String> tweetIds)
+            throws AlreadyFavoritedTweetException {
 
-        if (StringUtils.isNoneBlank(id)) {
-            return twitterRepository.favoriteTweet(id);
+        for (final String id : tweetIds) {
+            if (StringUtils.isNoneBlank(id)) {
+                try {
+                    return twitterRepository.favoriteTweet(id);
+                } catch (final RuntimeException exception) {
+                    log.warn(exception.getMessage());
+                }
+            }
         }
-        return new TweetResponse();
+
+        throw new AlreadyFavoritedTweetException();
     }
 }
