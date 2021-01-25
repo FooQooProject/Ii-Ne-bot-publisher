@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TwitterService {
 
+    private static final String NO_MORE_TWEET_ID = "0";
+
     private final TwitterRepository twitterRepository;
 
     /**
@@ -42,8 +44,9 @@ public class TwitterService {
                 if (StringUtils
                         .isBlank(tweetListResponses.get(idx - 1).getSearchMetaData()
                                 .getNextMaxId())
-                        || "0".equals(tweetListResponses.get(idx - 1).getSearchMetaData()
-                        .getNextMaxId())) {
+                        || NO_MORE_TWEET_ID
+                        .equals(tweetListResponses.get(idx - 1).getSearchMetaData()
+                                .getNextMaxId())) {
                     break;
                 }
 

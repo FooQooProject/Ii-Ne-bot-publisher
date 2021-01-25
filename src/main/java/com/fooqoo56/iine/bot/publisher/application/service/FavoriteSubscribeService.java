@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FavoriteSubscribeService {
 
+    private static final int RETRY_NUM_OF_TWEET = 10;
+
     private final TwitterService twitterService;
 
     /**
@@ -34,7 +36,7 @@ public class FavoriteSubscribeService {
                 response.stream().filter(res -> isValidatedTweet(res, payload))
                         .sorted(Comparator.comparingInt(s -> s.getUser().getFavouritesCount()))
                         .map(TweetResponse::getId)
-                        .limit(10)
+                        .limit(RETRY_NUM_OF_TWEET)
                         .collect(Collectors.toList());
 
         if (tweetIds.isEmpty()) {
