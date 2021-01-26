@@ -1,4 +1,4 @@
-name: DEPLOY
+name: DEPLOY-CRON
 
 on:
   workflow_dispatch:
@@ -11,7 +11,6 @@ on:
 
 env:
   GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
-  SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
 jobs:
   deploy:
@@ -30,7 +29,6 @@ jobs:
           echo $GCLOUD_SERVICE_KEY | base64 -d > ./src/main/resources/service-account.json
           gcloud config set project ii-ne-bot
           gcloud auth activate-service-account --key-file ./src/main/resources/service-account.json
-          echo $SECRET_KEY | base64 -d > ./secret.yaml
-          gradle appengineDeploy --stacktrace
+          gradle appengineDeployCron --stacktrace
         env:
           CI: true
