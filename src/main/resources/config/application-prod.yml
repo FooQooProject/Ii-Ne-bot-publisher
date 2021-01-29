@@ -26,3 +26,4 @@ extension:
       api-secret: ${API_SECRET}
       access-token: ${ACCESS_TOKEN}
       access-token-secret: ${ACCESS_TOKEN_SECRET}
+      max-in-memory-size: 16777216

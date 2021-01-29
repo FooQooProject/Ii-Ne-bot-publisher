@@ -3,13 +3,10 @@ package com.fooqoo56.iine.bot.publisher.infrastructure.api.repositoryimpl;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.config.BearerTokenClientConfig;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.response.Oauth2Response;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Repository
@@ -17,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class BearerTokenClient {
 
     private final BearerTokenClientConfig config;
-    private final RestTemplate bearerTokenTwitterTemplate;
+    private final WebClient bearerTokenTwitterClient;
 
     /**
      * トークン取得.
@@ -32,10 +29,13 @@ public class BearerTokenClient {
                         .build()
                         .toString();
 
-        return bearerTokenTwitterTemplate
-                .exchange(url, HttpMethod.POST, new HttpEntity<>(getBody(), new HttpHeaders()),
-                        Oauth2Response.class)
-                .getBody();
+        return bearerTokenTwitterClient
+                .post()
+                .uri(url)
+                .bodyValue(getBody())
+                .retrieve()
+                .bodyToMono(Oauth2Response.class)
+                .block();
     }
 
     /**
