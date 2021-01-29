@@ -1,13 +1,17 @@
 package com.fooqoo56.iine.bot.publisher.infrastructure.api.config;
 
-import com.fooqoo56.iine.bot.publisher.infrastructure.api.interceptor.RestRequestInterceptor;
+import com.fooqoo56.iine.bot.publisher.infrastructure.api.filter.RestRequestFilter;
+import io.netty.channel.ChannelOption;
 import java.time.Duration;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunctions;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
 @ConstructorBinding
 @ConfigurationProperties(prefix = "extension.oauth.twitter")
@@ -25,15 +29,23 @@ public class BearerTokenClientConfig {
     /**
      * Bearer APIのTemplate.
      *
-     * @return RestTemplate
+     * @param restRequestFilter ログ用フィルタ
+     * @return WebClient
      */
     @Bean
-    public RestTemplate bearerTokenTwitterTemplate() {
-        return RestTemplateConfig.restTemplateBuilder()
-                .additionalInterceptors(new RestRequestInterceptor())
-                .setConnectTimeout(connectTimeout)
-                .setReadTimeout(readTimeout)
-                .basicAuthentication(apikey, apiSecret)
+    public WebClient bearerTokenTwitterClient(final RestRequestFilter restRequestFilter) {
+        final HttpClient httpClient = HttpClient.create()
+                .responseTimeout(readTimeout)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout.toMillisPart());
+
+        final ReactorClientHttpConnector connector =
+                new ReactorClientHttpConnector(httpClient);
+
+        return WebClient.builder()
+                .clientConnector(connector)
+                .filter(ExchangeFilterFunctions
+                        .basicAuthentication(apikey, apiSecret))
+                .filter(restRequestFilter)
                 .build();
     }
 }
