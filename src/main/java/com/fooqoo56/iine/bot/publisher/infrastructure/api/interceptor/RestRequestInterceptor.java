@@ -7,6 +7,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,9 +24,10 @@ public class RestRequestInterceptor implements ClientHttpRequestInterceptor {
      * @return ClientHttpResponse
      * @throws IOException IOException
      */
+    @NonNull
     @Override
     public ClientHttpResponse intercept(
-            final HttpRequest request, final byte[] body,
+            final HttpRequest request, @NonNull final byte[] body,
             final ClientHttpRequestExecution execution) throws IOException {
 
         log.info(

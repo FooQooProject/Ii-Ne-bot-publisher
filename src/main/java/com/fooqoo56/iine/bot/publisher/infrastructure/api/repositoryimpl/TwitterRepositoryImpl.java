@@ -8,11 +8,11 @@ import com.fooqoo56.iine.bot.publisher.infrastructure.api.dto.response.TweetResp
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.util.OauthAuthorizationHeaderBuilder;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Repository
@@ -20,8 +20,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class TwitterRepositoryImpl implements TwitterRepository {
 
     private final TwitterConfig config;
-    private final RestTemplate twitterSearchTemplate;
     private final RestTemplate twitterFavoriteTemplate;
+    private final WebClient twitterSearchClient;
+    private final WebClient twitterFavoriteClient;
 
     /**
      * {@inheritDoc}
@@ -37,10 +38,12 @@ public class TwitterRepositoryImpl implements TwitterRepository {
                         .build()
                         .toString();
 
-        return twitterSearchTemplate
-                .exchange(url, HttpMethod.GET, new HttpEntity<String>(headers),
-                        TweetListResponse.class)
-                .getBody();
+        return twitterSearchClient
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(TweetListResponse.class)
+                .block();
     }
 
     /**
@@ -48,8 +51,6 @@ public class TwitterRepositoryImpl implements TwitterRepository {
      */
     @Override
     public TweetResponse favoriteTweet(final String id) {
-
-        final HttpHeaders headers = new HttpHeaders();
 
         final OauthAuthorizationHeaderBuilder builder = OauthAuthorizationHeaderBuilder
                 .builder()
@@ -62,10 +63,6 @@ public class TwitterRepositoryImpl implements TwitterRepository {
                 .queryParameters(Map.of("id", id))
                 .build();
 
-        headers.set(HttpHeaders.AUTHORIZATION,
-                builder.getOauthHeader()
-        );
-
         final String url =
                 UriComponentsBuilder.fromHttpUrl(config.getBaseUrl())
                         .path(getFavoritePath())
@@ -73,10 +70,13 @@ public class TwitterRepositoryImpl implements TwitterRepository {
                         .build()
                         .toString();
 
-        return twitterFavoriteTemplate
-                .exchange(url, HttpMethod.POST, new HttpEntity<String>(headers),
-                        TweetResponse.class)
-                .getBody();
+        return twitterFavoriteClient
+                .post()
+                .uri(url)
+                .header(HttpHeaders.AUTHORIZATION, builder.getOauthHeader())
+                .retrieve()
+                .bodyToMono(TweetResponse.class)
+                .block();
     }
 
     /**
