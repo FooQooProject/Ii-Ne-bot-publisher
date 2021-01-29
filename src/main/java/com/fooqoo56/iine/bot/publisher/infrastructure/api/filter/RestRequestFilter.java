@@ -25,15 +25,6 @@ public class RestRequestFilter implements ExchangeFilterFunction {
         log.info(
                 "api request header: {}", request.headers().toString());
 
-        /*final ClientHttpResponse response =
-                execution.execute(request, body);
-        log.info(
-                "api response - {}: {}",
-                response.getRawStatusCode(),
-                response.getStatusText());
-        log.info(
-                "api response header: {}", response.getHeaders().toString());*/
-
         return next.exchange(request)
                 .doOnSuccess(clientResponse -> {
                     // response logging

@@ -29,10 +29,11 @@ public class BearerTokenClientConfig {
     /**
      * Bearer APIのTemplate.
      *
-     * @return RestTemplate
+     * @param restRequestFilter ログ用フィルタ
+     * @return WebClient
      */
     @Bean
-    public WebClient bearerTokenTwitterTemplate(final RestRequestFilter restRequestFilter) {
+    public WebClient bearerTokenTwitterClient(final RestRequestFilter restRequestFilter) {
         final HttpClient httpClient = HttpClient.create()
                 .responseTimeout(readTimeout)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout.toMillisPart());

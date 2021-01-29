@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class BearerTokenClient {
 
     private final BearerTokenClientConfig config;
-    private final WebClient bearerTokenTwitterTemplate;
+    private final WebClient bearerTokenTwitterClient;
 
     /**
      * トークン取得.
@@ -29,7 +29,7 @@ public class BearerTokenClient {
                         .build()
                         .toString();
 
-        return bearerTokenTwitterTemplate
+        return bearerTokenTwitterClient
                 .post()
                 .uri(url)
                 .bodyValue(getBody())

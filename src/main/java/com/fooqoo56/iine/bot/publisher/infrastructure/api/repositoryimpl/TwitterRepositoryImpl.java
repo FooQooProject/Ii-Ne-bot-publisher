@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -20,7 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class TwitterRepositoryImpl implements TwitterRepository {
 
     private final TwitterConfig config;
-    private final RestTemplate twitterFavoriteTemplate;
     private final WebClient twitterSearchClient;
     private final WebClient twitterFavoriteClient;
 

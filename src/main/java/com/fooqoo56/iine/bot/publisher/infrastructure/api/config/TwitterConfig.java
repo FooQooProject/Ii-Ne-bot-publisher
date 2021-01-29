@@ -2,8 +2,6 @@ package com.fooqoo56.iine.bot.publisher.infrastructure.api.config;
 
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.filter.Oauth2Filter;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.filter.RestRequestFilter;
-import com.fooqoo56.iine.bot.publisher.infrastructure.api.interceptor.Oauth2Interceptor;
-import com.fooqoo56.iine.bot.publisher.infrastructure.api.interceptor.RestRequestInterceptor;
 import io.netty.channel.ChannelOption;
 import java.time.Duration;
 import lombok.Getter;
@@ -12,7 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -42,19 +39,12 @@ public class TwitterConfig {
     private final Integer maxInMemorySize;
 
     /**
-     * Twitter APIのTemplate.
+     * 検索APIクライアント.
      *
-     * @return RestTemplate
+     * @param oauth2Filter      Oauth2Filter
+     * @param restRequestFilter ログフィルタ
+     * @return WebClient
      */
-    @Bean
-    public RestTemplate twitterSearchTemplate(final Oauth2Interceptor twitterOauth2Interceptor) {
-        return RestTemplateConfig.restTemplateBuilder()
-                .additionalInterceptors(twitterOauth2Interceptor, new RestRequestInterceptor())
-                .setConnectTimeout(connectTimeout)
-                .setReadTimeout(readTimeout)
-                .build();
-    }
-
     @Bean
     public WebClient twitterSearchClient(final Oauth2Filter oauth2Filter,
                                          final RestRequestFilter restRequestFilter) {
@@ -78,19 +68,11 @@ public class TwitterConfig {
     }
 
     /**
-     * Twitter Favorite APIのTemplate.
+     * いいねAPIクライアント.
      *
-     * @return RestTemplate
+     * @param restRequestFilter ログフィルタ
+     * @return WebClient
      */
-    @Bean
-    public RestTemplate twitterFavoriteTemplate() {
-        return RestTemplateConfig.restTemplateBuilder()
-                .additionalInterceptors(new RestRequestInterceptor())
-                .setConnectTimeout(connectTimeout)
-                .setReadTimeout(readTimeout)
-                .build();
-    }
-
     @Bean
     public WebClient twitterFavoriteClient(final RestRequestFilter restRequestFilter) {
         final HttpClient httpClient = HttpClient.create()
