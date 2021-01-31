@@ -23,15 +23,9 @@ public class BearerTokenClient {
      */
     public Oauth2Response getBearerToken() {
 
-        final String url =
-                UriComponentsBuilder.fromHttpUrl(config.getBaseUrl())
-                        .path(config.getPath())
-                        .build()
-                        .toString();
-
         return bearerTokenTwitterClient
                 .post()
-                .uri(url)
+                .uri(config.getPath())
                 .bodyValue(getBody())
                 .retrieve()
                 .bodyToMono(Oauth2Response.class)
