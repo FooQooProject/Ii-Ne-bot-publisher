@@ -49,7 +49,7 @@ dependencies {
             'org.springframework.integration:spring-integration-core',
             'com.google.oauth-client:google-oauth-client:1.31.4',
             'com.google.guava:guava:30.1-jre',
-            'org.springframework.boot:spring-boot-starter-webflux'
+            'org.springframework.boot:spring-boot-starter-webflux:2.4.2'
     )
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

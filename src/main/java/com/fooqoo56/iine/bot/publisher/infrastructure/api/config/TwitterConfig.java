@@ -3,6 +3,7 @@ package com.fooqoo56.iine.bot.publisher.infrastructure.api.config;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.filter.Oauth2Filter;
 import com.fooqoo56.iine.bot.publisher.infrastructure.api.filter.RestRequestFilter;
 import io.netty.channel.ChannelOption;
+import io.netty.resolver.DefaultAddressResolverGroup;
 import java.time.Duration;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -49,8 +50,11 @@ public class TwitterConfig {
     public WebClient twitterSearchClient(final Oauth2Filter oauth2Filter,
                                          final RestRequestFilter restRequestFilter) {
         final HttpClient httpClient = HttpClient.create()
+                .baseUrl(baseUrl)
                 .responseTimeout(readTimeout)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout.toMillisPart());
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout.toMillisPart())
+                .resolver(DefaultAddressResolverGroup.INSTANCE);
+        ;
 
         final ReactorClientHttpConnector connector =
                 new ReactorClientHttpConnector(httpClient);
@@ -76,8 +80,11 @@ public class TwitterConfig {
     @Bean
     public WebClient twitterFavoriteClient(final RestRequestFilter restRequestFilter) {
         final HttpClient httpClient = HttpClient.create()
+                .baseUrl(baseUrl)
                 .responseTimeout(readTimeout)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout.toMillisPart());
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout.toMillisPart())
+                .resolver(DefaultAddressResolverGroup.INSTANCE);
+        ;
 
         final ReactorClientHttpConnector connector =
                 new ReactorClientHttpConnector(httpClient);

@@ -27,14 +27,12 @@ public class TwitterRepositoryImpl implements TwitterRepository {
      */
     @Override
     public TweetListResponse findTweet(final TweetRequest request) {
-        final HttpHeaders headers = new HttpHeaders();
 
-        final String url =
-                UriComponentsBuilder.fromHttpUrl(config.getBaseUrl())
-                        .path(getSearchPath())
-                        .queryParams(request.getQueryMap())
-                        .build()
-                        .toString();
+        final String url = UriComponentsBuilder.newInstance()
+                .path(getSearchPath())
+                .queryParams(request.getQueryMap())
+                .build()
+                .toString();
 
         return twitterSearchClient
                 .get()
@@ -62,7 +60,7 @@ public class TwitterRepositoryImpl implements TwitterRepository {
                 .build();
 
         final String url =
-                UriComponentsBuilder.fromHttpUrl(config.getBaseUrl())
+                UriComponentsBuilder.newInstance()
                         .path(getFavoritePath())
                         .queryParam("id", id)
                         .build()
