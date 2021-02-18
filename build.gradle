@@ -4,14 +4,14 @@ buildscript {
     }
     dependencies {
         // Spring Boot Gradle Plugin を使用
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.4.2'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.4.3'
         // Google App Engine Gradle plugin を使用
         classpath 'com.google.cloud.tools:appengine-gradle-plugin:2.4.1'
     }
 }
 
 plugins {
-    id 'org.springframework.boot' version '2.4.2'
+    id 'org.springframework.boot' version '2.4.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'groovy'
@@ -49,7 +49,7 @@ dependencies {
             'org.springframework.integration:spring-integration-core',
             'com.google.oauth-client:google-oauth-client:1.31.4',
             'com.google.guava:guava:30.1-jre',
-            'org.springframework.boot:spring-boot-starter-webflux:2.4.2'
+            'org.springframework.boot:spring-boot-starter-webflux:2.4.3'
     )
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
